@@ -40,6 +40,11 @@ namespace Core::Renderer::Shaders {
 		glUseProgram(_ID);
 	}
 
+	void Core::Renderer::Shaders::ShaderProgram::SetSampler(const std::string& name, const GLint val) {
+		auto loc = glGetUniformLocation(_ID, name.c_str());
+		glUniform1i(loc, val);
+	}
+
 	ShaderProgram& Core::Renderer::Shaders::ShaderProgram::operator=(ShaderProgram&& shaderProgram) noexcept {
 		glDeleteProgram(_ID);
 		_ID = shaderProgram._ID;

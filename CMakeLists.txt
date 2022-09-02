@@ -6,11 +6,14 @@ project(${PROJECT_NAME})
 
 
 add_executable(${PROJECT_NAME} 
-src/main.cpp
-src/Renderer/Shaders/ShaderProgram.h
-src/Renderer/Shaders/ShaderProgram.cpp
-src/Core/Resources/ResourceManager.h
-src/Core/Resources/ResourceManager.cpp
+    src/main.cpp
+    src/Renderer/Shaders/ShaderProgram.h
+    src/Renderer/Shaders/ShaderProgram.cpp
+    src/Renderer/Drawable/Texture2D.h
+    src/Renderer/Drawable/Texture2D.cpp
+    src/Core/Resources/ResourceManager.h
+    src/Core/Resources/ResourceManager.cpp
+    src/Core/Resources/stb_image.h
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)

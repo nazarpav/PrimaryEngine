@@ -16,6 +16,7 @@ namespace Core::Renderer::Shaders {
 		ShaderProgram& operator=(const ShaderProgram&) = delete;
 		ShaderProgram& operator=(ShaderProgram&& shaderProgram) noexcept;
 		ShaderProgram(ShaderProgram&& shaderProgram)noexcept;
+		void SetSampler(const std::string& name, const GLint val);
 
 	private:
 		bool CreateShader(const std::string& source, const GLenum shaderType, GLuint& shaderID);

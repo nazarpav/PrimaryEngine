@@ -4,6 +4,9 @@
 
 #include"Renderer/Shaders/ShaderProgram.h"
 #include"Core/Resources/ResourceManager.h"
+
+
+
 struct FDot {
 	float x;
 	float y;
@@ -15,7 +18,8 @@ struct IDot {
 IDot w_size;
 
 GLfloat points[] = {
-	0.0f,0.5f,0.0f,
+	-0.5f,0.5f,0.0f,
+	0.5f,0.5f,0.0f,
 	0.5f,-0.5f,0.0f,
 	-0.5f,-0.5f,0.0f
 };
@@ -23,7 +27,15 @@ GLfloat points[] = {
 GLfloat colors[] = {
 	1.0f,0.0f,0.0f,
 	0.0f,1.0f,0.0f,
+	0.0f,1.0f,0.0f,
 	0.0f,0.0f,1.0f
+};
+
+GLfloat texture[] = {
+	0.0f,1.0f,
+	1.0f,1.0f,
+	1.0f,0.0f,
+	0.0f,0.0f
 };
 
 void glfwWindowSizeCallback(GLFWwindow* win, int w, int h) {
@@ -63,11 +75,13 @@ int main(int argc, char** argv)
 	std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
 	std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
-	glClearColor(0, 1, 0, 1);
+	glClearColor(0, 0, 0,0);
 	{
 		ResourceManager resourceManager(argv[0]);
 
 		auto shaderProgram = resourceManager.LoadShader("StandartShader", "res/shaders/standart.vsh", "res/shaders/standart.fsh");
+
+		auto tex = resourceManager.LoadTexture("test", "res/textures/test2.png");
 
 		if (shaderProgram == false) {
 			std::cerr << "Can`t create shader program!" << std::endl;
@@ -83,6 +97,12 @@ int main(int argc, char** argv)
 		glGenBuffers(1, &colors_vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+		
+		GLuint texture_vbo = 0;
+		glGenBuffers(1, &texture_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, texture_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(texture), texture, GL_STATIC_DRAW);
+
 
 		GLuint vao = 0;
 		glGenVertexArrays(1, &vao);
@@ -95,13 +115,20 @@ int main(int argc, char** argv)
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		
+		glEnableVertexAttribArray(2);
+		glBindBuffer(GL_ARRAY_BUFFER, texture_vbo);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 		/* Loop until the user closes the window */
+		shaderProgram->use();
+		shaderProgram->SetSampler("sampler0", 0);
 		while (!glfwWindowShouldClose(window))
 		{
 			/* Render here */
 			glClear(GL_COLOR_BUFFER_BIT);
 			shaderProgram->use();
 			glBindVertexArray(vao);
+			tex->bind();
 			glDrawArrays(GL_TRIANGLES, 0, 3);
 			/* Swap front and back buffers */
 			glfwSwapBuffers(window);
