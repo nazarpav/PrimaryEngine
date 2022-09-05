@@ -1,5 +1,6 @@
 #pragma once
 #include "glad/glad.h"
+#include "glm/mat4x4.hpp"
 #include <string>
 
 namespace Core::Renderer::Shaders {
@@ -10,13 +11,14 @@ namespace Core::Renderer::Shaders {
 		inline bool IsCompiled()const {
 			return _isCompiled;
 		}
-		void use();
+		void Use();
 		ShaderProgram() = delete;
 		ShaderProgram(ShaderProgram&) = delete;
 		ShaderProgram& operator=(const ShaderProgram&) = delete;
 		ShaderProgram& operator=(ShaderProgram&& shaderProgram) noexcept;
 		ShaderProgram(ShaderProgram&& shaderProgram)noexcept;
 		void SetSampler(const std::string& name, const GLint val);
+		void SetMatrix4(const std::string& name, const glm::mat4 mtrx);
 
 	private:
 		bool CreateShader(const std::string& source, const GLenum shaderType, GLuint& shaderID);

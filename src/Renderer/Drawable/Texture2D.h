@@ -1,6 +1,7 @@
 #pragma once
 
-#include<glad/glad.h>
+#include"glad/glad.h"
+#include"glm/vec2.hpp"
 #include<string>
 namespace Core::Renderer::Drawable {
 	class Texture2D {
@@ -15,6 +16,9 @@ namespace Core::Renderer::Drawable {
 		Texture2D& operator=(Texture2D&& texture2D) noexcept;
 		Texture2D(Texture2D&& texture2D) noexcept;
 		void bind() const;
+		inline glm::vec2 GetTextureSize() {
+			return glm::vec2(static_cast<float>(_width), static_cast<float>(_height));
+		}
 		~Texture2D();
 	private:
 

@@ -1,42 +1,15 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
 #include <iostream>
 
 #include"Renderer/Shaders/ShaderProgram.h"
+#include"Renderer/Drawable/Sprite.h"
 #include"Core/Resources/ResourceManager.h"
+#include"glm/vec2.hpp"
+#include"glm/mat4x4.hpp"
+#include"glm/gtc/matrix_transform.hpp"
 
-
-
-struct FDot {
-	float x;
-	float y;
-};
-struct IDot {
-	int x;
-	int y;
-};
-IDot w_size;
-
-GLfloat points[] = {
-	-0.5f,0.5f,0.0f,
-	0.5f,0.5f,0.0f,
-	0.5f,-0.5f,0.0f,
-	-0.5f,-0.5f,0.0f
-};
-
-GLfloat colors[] = {
-	1.0f,0.0f,0.0f,
-	0.0f,1.0f,0.0f,
-	0.0f,1.0f,0.0f,
-	0.0f,0.0f,1.0f
-};
-
-GLfloat texture[] = {
-	0.0f,1.0f,
-	1.0f,1.0f,
-	1.0f,0.0f,
-	0.0f,0.0f
-};
+glm::ivec2 w_size(640, 480);
 
 void glfwWindowSizeCallback(GLFWwindow* win, int w, int h) {
 	w_size.x = w;
@@ -47,6 +20,14 @@ void glfwKeyCallback(GLFWwindow* win, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(win, GL_TRUE);
 	}
+	if (key == GLFW_KEY_RIGHT) {
+	}
+	if (key == GLFW_KEY_LEFT) {
+	}
+	if (key == GLFW_KEY_UP) {
+	}
+	if (key == GLFW_KEY_DOWN) {
+	}
 }
 int main(int argc, char** argv)
 {
@@ -56,7 +37,7 @@ int main(int argc, char** argv)
 		return -1;
 
 	/* Create a windowed mode window and its OpenGL context */
-	GLFWwindow* window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(w_size.x, w_size.y, "Hello World", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -75,65 +56,34 @@ int main(int argc, char** argv)
 	std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
 	std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
-	glClearColor(0, 0, 0,0);
+	glClearColor(0.f, 0.f, 0, 0);
 	{
 		ResourceManager resourceManager(argv[0]);
 
-		auto shaderProgram = resourceManager.LoadShader("StandartShader", "res/shaders/standart.vsh", "res/shaders/standart.fsh");
+		auto shaderProgram = resourceManager.LoadShader("shader", "res/shaders/standart.vsh", "res/shaders/standart.fsh");
 
-		auto tex = resourceManager.LoadTexture("test", "res/textures/test2.png");
+		auto tex = resourceManager.LoadTexture("texture", "res/textures/test2.png");
 
-		if (shaderProgram == false) {
-			std::cerr << "Can`t create shader program!" << std::endl;
-			return -1;
-		}
-
-		GLuint points_vbo = 0;
-		glGenBuffers(1, &points_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
-
-		GLuint colors_vbo = 0;
-		glGenBuffers(1, &colors_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-		
-		GLuint texture_vbo = 0;
-		glGenBuffers(1, &texture_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, texture_vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(texture), texture, GL_STATIC_DRAW);
-
-
-		GLuint vao = 0;
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-		
-		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, texture_vbo);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+		auto sprite = resourceManager.LoadSprite("sprite", "texture", "shader", glm::vec3(0.f, 0.f, 0.f));
+		Core::Transform trans = sprite->GetTransform();
+		trans.SetPosition2D(glm::vec2(100.f,100.f));
+		trans.SetRotation2D(45.f);
+		trans.Scale(glm::vec2(.1f, .1f));
+		sprite->SetTransform(trans);
 		/* Loop until the user closes the window */
-		shaderProgram->use();
+		shaderProgram->Use();
 		shaderProgram->SetSampler("sampler0", 0);
-		while (!glfwWindowShouldClose(window))
-		{
-			/* Render here */
-			glClear(GL_COLOR_BUFFER_BIT);
-			shaderProgram->use();
-			glBindVertexArray(vao);
-			tex->bind();
-			glDrawArrays(GL_TRIANGLES, 0, 3);
-			/* Swap front and back buffers */
-			glfwSwapBuffers(window);
 
-			/* Poll for and process events */
+
+		glm::mat4 projectionMatrix = glm::ortho(0.f, static_cast<float>(w_size.x), 0.f, static_cast<float>(w_size.y), -100.f, 100.f);
+		shaderProgram->SetMatrix4("projection_mat", projectionMatrix);
+
+		while (!glfwWindowShouldClose(window)){
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			sprite->Draw();
+
+			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
 	}

@@ -1,4 +1,5 @@
 #include "ShaderProgram.h"
+#include "glm/gtc/type_ptr.hpp"
 #include <iostream>
 namespace Core::Renderer::Shaders {
 
@@ -36,13 +37,18 @@ namespace Core::Renderer::Shaders {
 		glDeleteProgram(_ID);
 	}
 
-	void Core::Renderer::Shaders::ShaderProgram::use() {
+	void Core::Renderer::Shaders::ShaderProgram::Use() {
 		glUseProgram(_ID);
 	}
 
 	void Core::Renderer::Shaders::ShaderProgram::SetSampler(const std::string& name, const GLint val) {
 		auto loc = glGetUniformLocation(_ID, name.c_str());
 		glUniform1i(loc, val);
+	}
+
+	void ShaderProgram::SetMatrix4(const std::string& name, const glm::mat4 mtrx) {
+		auto loc = glGetUniformLocation(_ID, name.c_str());
+		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mtrx));
 	}
 
 	ShaderProgram& Core::Renderer::Shaders::ShaderProgram::operator=(ShaderProgram&& shaderProgram) noexcept {

@@ -65,6 +65,24 @@ std::shared_ptr<Core::Renderer::Drawable::Texture2D> ResourceManager::GetTexture
 	return nullptr;
 }
 
+std::shared_ptr<Core::Renderer::Drawable::Sprite> ResourceManager::LoadSprite(const std::string& spriteName, const std::string& textureName, const std::string& shaderName, glm::vec3 pos)
+{
+	auto texture = GetTexture(textureName);
+	auto shader = GetShader(shaderName);
+	std::shared_ptr<Core::Renderer::Drawable::Sprite> newSprite = _sprites.emplace(spriteName, std::make_shared<Core::Renderer::Drawable::Sprite>(texture,shader, Core::Transform(pos))).first->second;
+	return newSprite;
+}
+
+std::shared_ptr<Core::Renderer::Drawable::Sprite> ResourceManager::GetSprite(const std::string& spriteName)
+{
+	SpriteMap::const_iterator it = _sprites.find(spriteName);
+	if (it != _sprites.end()) {
+		return it->second;
+	}
+	std::cerr << "Can`t find the texture: " << spriteName << std::endl;
+	return nullptr;
+}
+
 std::string ResourceManager::GetStringFromFile(const std::string& relFilePath) {
 	std::ifstream f;
 	f.open(_basePath + "/" + relFilePath.c_str(), std::ios::in | std::ios::binary);
